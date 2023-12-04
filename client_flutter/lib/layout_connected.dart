@@ -69,7 +69,21 @@ class _ImageGridViewState extends State<ImageGridView> {
     clickedStatus = List.generate(16, (index) => false);
   }
 
-  Future<void> _onTapLogic(AppData appData, int index) async {
+  updateImagesAutomatically(AppData appData){
+    setState(() {
+      for (int i = 0; i < appData.board.length; i++) {
+        if (appData.board[i] == '-') {
+          imagePaths[i] = 'assets/imagen_inicial.jpg';
+        } else {
+          // Actualiza la ruta de la imagen según el nuevo estado del tablero
+          imagePaths[i] = 'assets/${appData.board[i]}.png';
+        }
+      }
+    });
+  }
+
+  // Nueva función que realiza la lógica de onTap
+  void onTapLogic(AppData appData, int index) {
     String color = appData.boardColors[index];
     print(appData.board);
 
@@ -83,7 +97,7 @@ class _ImageGridViewState extends State<ImageGridView> {
         int contador = appData.contarRepeticionesTotales(appData.board);
         print(appData.board);
         if (contador == appData.miPuntuacion + 1) {
-          print("---has acertado una mas ----");
+          print("---has acertado una ----");
           appData.miPuntuacion++;
           appData.tiradas = 0;
         } else {
@@ -93,15 +107,19 @@ class _ImageGridViewState extends State<ImageGridView> {
         if (appData.tiradas == 2) {
           appData.board = appData.modificarSinRepeticiones(appData.board);
           appData.messageBoard();
-          appData.tuTurno = false;
-        }
-      }
-    });
-    await Future.delayed(const Duration(seconds: 3));
-    setState(() {
-      for (int i = 0; i < appData.board.length; i++) {
-        if (appData.board[i] == '-') {
-          imagePaths[i] = 'assets/imagen_inicial.jpg';
+
+          Future.delayed(const Duration(seconds:2), () {
+          
+
+            for (int i = 0; i < appData.board.length; i++) {
+              if (appData.board[i] == '-') {
+                imagePaths[i] = 'assets/imagen_inicial.jpg';
+              }
+            }
+            setState(() {});
+            appData.tuTurno = false;
+          });
+          
         }
       }
     });
@@ -110,6 +128,10 @@ class _ImageGridViewState extends State<ImageGridView> {
   @override
   Widget build(BuildContext context) {
     AppData appData = Provider.of<AppData>(context);
+    if (appData.tuTurno == false){
+      print('hola');
+      updateImagesAutomatically(appData);
+    }
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
@@ -120,7 +142,8 @@ class _ImageGridViewState extends State<ImageGridView> {
       itemBuilder: (context, index) {
         return InkWell(
           onTap: () {
-            _onTapLogic(appData, index);
+            // Llamar a la nueva función onTapLogic
+            onTapLogic(appData, index);
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -136,3 +159,4 @@ class _ImageGridViewState extends State<ImageGridView> {
     );
   }
 }
+
