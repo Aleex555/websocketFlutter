@@ -10,51 +10,129 @@ class LayoutConnected extends StatefulWidget {
 }
 
 class _LayoutConnectedState extends State<LayoutConnected> {
-  final _messageController = TextEditingController();
-  final FocusNode _messageFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     AppData appData = Provider.of<AppData>(context);
+    String usuario = appData.usu;
+    int puntuRival = appData.puntuacionRival;
+    int miPuntuacion = appData.miPuntuacion;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Layout Connected'),
+        title: Text('Memory'),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 4.0,
-                mainAxisSpacing: 4.0,
-              ),
-              itemCount: 16,
-              itemBuilder: (BuildContext context, int index) {
-                return Image.asset(
-                  'assets/imagen_unica.png',
-                  fit: BoxFit.cover,
-                );
-              },
+          // Espacio arriba con un texto
+          Padding(
+            padding: EdgeInsets.only(top: 40.0),
+            child: Text(
+              
+              'En Espera $usuario : $miPuntuacion.   , Le toca a Cristian : $puntuRival.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _messageController,
-              focusNode: _messageFocusNode,
-              decoration: InputDecoration(
-                hintText: 'Ingrese su mensaje',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {},
-                ),
-              ),
+          // Separación entre el texto y la cuadrícula
+          const SizedBox(height: 20.0),
+          // Cuadrícula centrada en el medio dentro de un Container
+          Center(
+            child: Container(
+              width: 400, 
+              height: 400, 
+              child: ImageGridView(),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class ImageGridView extends StatefulWidget {
+  const ImageGridView({Key? key}) : super(key: key);
+
+  @override
+  _ImageGridViewState createState() => _ImageGridViewState();
+}
+
+class _ImageGridViewState extends State<ImageGridView> {
+  late List<String> imagePaths;
+  late List<bool> clickedStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    imagePaths = List.generate(16, (index) => 'assets/imagen_inicial.jpg');
+    clickedStatus = List.generate(16, (index) => false);
+  }
+
+  Future<void> _onTapLogic(AppData appData, int index) async {
+    String color = appData.boardColors[index];
+    print(appData.board);
+
+    setState(() {
+      if (appData.tuTurno == true) {
+        clickedStatus[index] = !clickedStatus[index];
+        if (clickedStatus[index]) {
+          imagePaths[index] = 'assets/$color.png';
+          appData.board[index] = color;
+        }
+        int contador = appData.contarRepeticionesTotales(appData.board);
+        print(appData.board);
+        if (contador == appData.miPuntuacion + 1) {
+          print("---has acertado una mas ----");
+          appData.miPuntuacion++;
+          appData.tiradas = 0;
+        } else {
+          appData.tiradas++;
+        }
+
+        if (appData.tiradas == 2) {
+          appData.board = appData.modificarSinRepeticiones(appData.board);
+          appData.messageBoard();
+          appData.tuTurno = false;
+        }
+      }
+    });
+    await Future.delayed(const Duration(seconds: 3));
+    setState(() {
+      for (int i = 0; i < appData.board.length; i++) {
+        if (appData.board[i] == '-') {
+          imagePaths[i] = 'assets/imagen_inicial.jpg';
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    AppData appData = Provider.of<AppData>(context);
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ),
+      itemCount: 16,
+      itemBuilder: (context, index) {
+        return InkWell(
+          onTap: () {
+            _onTapLogic(appData, index);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              imagePaths[index],
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      },
     );
   }
 }

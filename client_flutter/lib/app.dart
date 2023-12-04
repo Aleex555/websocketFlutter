@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'layout_connected.dart';
-import 'layout_connecting.dart';
+
 import 'layout_disconnected.dart';
-import 'layout_disconnecting.dart';
+
 import 'app_data.dart';
 
 // Main application widget
@@ -22,10 +23,6 @@ class AppState extends State<App> {
     AppData appData = Provider.of<AppData>(context);
 
     switch (appData.connectionStatus) {
-      case ConnectionStatus.disconnecting:
-        return const LayoutDisconnecting();
-      case ConnectionStatus.connecting:
-        return const LayoutConnecting();
       case ConnectionStatus.connected:
         return const LayoutConnected();
       default:
@@ -34,12 +31,15 @@ class AppState extends State<App> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Farem servir la base 'Cupertino'
-    return CupertinoApp(
+   Widget build(BuildContext context) {
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: const CupertinoThemeData(brightness: Brightness.light),
-      home: _setLayout(context),
+      theme: ThemeData(
+        brightness: Brightness.light,
+      ),
+      home: Scaffold(
+        body: _setLayout(context),
+      ),
     );
   }
 }

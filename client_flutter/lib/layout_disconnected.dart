@@ -51,7 +51,7 @@ class _LayoutDisconnectedState extends State<LayoutDisconnected> {
         padding: const EdgeInsets.all(20),
         children: [
           const SizedBox(height: 50),
-          _buildTextFormField("Server IP", appData.ip, _ipController),
+          _buildTextFormField("Server IP", "localhost", _ipController),
           const SizedBox(height: 20),
           _buildTextFormField("Server port", appData.port, _portController),
           const SizedBox(height: 20),
@@ -66,6 +66,7 @@ class _LayoutDisconnectedState extends State<LayoutDisconnected> {
                 onPressed: () {
                   appData.ip = _ipController.text;
                   appData.port = _portController.text;
+                  appData.usu = _messageController.text;
                   appData.connectToServer();
                 },
                 padding: EdgeInsets.zero,

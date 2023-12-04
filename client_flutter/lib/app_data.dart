@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
 
 import 'package:web_socket_channel/io.dart';
 
@@ -12,43 +11,19 @@ import 'package:web_socket_channel/io.dart';
 
 enum ConnectionStatus {
   disconnected,
-  disconnecting,
-  connecting,
   connected,
 }
 
 class AppData with ChangeNotifier {
   String ip = "localhost";
   String port = "8888";
-  bool imagesReady = false;
-  Image rojo = Image.asset("/assets/rojo.png");
-  Image negro = Image.asset("/assets/negro.png");
-  Image amarillo = Image.asset("/assets/amarillo.png");
-  Image gris = Image.asset("/assets/gris.png");
-  Image naranja = Image.asset("/assets/naranja.png");
-  Image rosa = Image.asset("/assets/rosa.png");
-  Image verde = Image.asset("/assets/verde.png");
-  Image azul = Image.asset("/assets/azul.png");
-  List<String> board = [
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-"
-  ];
+  String usu = "";
+  bool tuTurno = false;
+  int puntuacionRival = 0;
+  int miPuntuacion = 0;
+  List<dynamic> board = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"];
 
-  List<String> boardColors = [];
+  List<dynamic> boardColors = [];
 
   IOWebSocketChannel? _channel;
   ConnectionStatus connectionStatus = ConnectionStatus.disconnected;
@@ -58,6 +33,7 @@ class AppData with ChangeNotifier {
   String selectedClient = "";
   int? selectedClientIndex;
   String messages = "";
+  int tiradas = 0;
 
   AppData() {
     _getLocalIpAddress();
@@ -80,7 +56,6 @@ class AppData with ChangeNotifier {
   }
 
   void connectToServer() async {
-    connectionStatus = ConnectionStatus.connecting;
     notifyListeners();
     await Future.delayed(const Duration(seconds: 1));
 
@@ -94,17 +69,24 @@ class AppData with ChangeNotifier {
         }
 
         switch (data['type']) {
+          case "turno":
+                tuTurno = true;
+                print("lo recibi");
+                
+                break;
+            case "board":
+                board.clear();
+                board = data["list"];
+                puntuacionRival=data["puntuacion"];
+
+                board.remove(mySocketId);
+                print("board recibido");
+                
+            
+                
+            break;
           case 'list':
             boardColors = data["list"];
-            break;
-          case 'id':
-            mySocketId = data['value'];
-            messages += "Id received: ${data['value']}\n";
-            break;
-          case 'connected':
-            clients.add(data['id']);
-            clients.remove(mySocketId);
-            messages += "Connected client: ${data['id']}\n";
             break;
           case 'disconnected':
             String removeId = data['id'];
@@ -114,12 +96,7 @@ class AppData with ChangeNotifier {
             clients.remove(data['id']);
             messages += "Disconnected client: ${data['id']}\n";
             break;
-          case 'private':
-            messages +=
-                "Private message from '${data['from']}': ${data['value']}\n";
-            break;
           default:
-            messages += "Message from '${data['from']}': ${data['value']}\n";
             break;
         }
 
@@ -145,7 +122,6 @@ class AppData with ChangeNotifier {
   }
 
   disconnectFromServer() async {
-    connectionStatus = ConnectionStatus.disconnecting;
     notifyListeners();
 
     // Simulate connection delay
@@ -154,47 +130,61 @@ class AppData with ChangeNotifier {
     _channel!.sink.close();
   }
 
-  selectClient(int index) {
-    if (selectedClientIndex != index) {
-      selectedClientIndex = index;
-      selectedClient = clients[index];
-    } else {
-      selectedClientIndex = null;
-      selectedClient = "";
+  int contarRepeticionesTotales(List<dynamic> lista) {
+    int contador = 0;
+
+    for (int i = 0; i < lista.length; i++) {
+      String elementoActual = lista[i];
+
+      if (elementoActual != "-") {
+        for (int j = i + 1; j < lista.length; j++) {
+          String otroElemento = lista[j];
+
+          if (otroElemento != "-" && elementoActual == otroElemento) {
+            contador++;
+          }
+        }
+      }
     }
-    notifyListeners();
+
+    print("Se repite $contador veces.");
+    return contador;
   }
 
-  refreshClientsList() {
+  messageBoard() {
     final message = {
-      'type': 'list',
+      'type': 'board',
+      'from': 'cliente',
+      'puntuacion': miPuntuacion,
+      'value': board,
+      'desti' : mySocketId
     };
     _channel!.sink.add(jsonEncode(message));
   }
+  List modificarSinRepeticiones(List<dynamic> lista) {
+  for (int i = 0; i < lista.length; i++) {
+    String elementoActual = lista[i];
 
-  send(String msg) {
-    if (selectedClientIndex == null) {
-      broadcastMessage(msg);
-    } else {
-      privateMessage(msg);
+    // Añadimos una condición para asegurarnos de que elementoActual no sea "-"
+    if (elementoActual != "-") {
+      bool seRepite = false;
+
+      for (int j = i + 1; j < lista.length; j++) {
+        String otroElemento = lista[j];
+
+        // Añadimos una condición para asegurarnos de que otroElemento no sea "-"
+        if (otroElemento != "-" && elementoActual == otroElemento) {
+          seRepite = true;
+          break;
+        }
+      }
+
+      if (!seRepite) {
+        // Si no se repite, modificamos la lista original para hacer que sea "-"
+        lista[i] = "-";
+      }
     }
   }
-
-  broadcastMessage(String msg) {
-    final message = {
-      'type': 'broadcast',
-      'value': msg,
-    };
-    _channel!.sink.add(jsonEncode(message));
-  }
-
-  privateMessage(String msg) {
-    if (selectedClient == "") return;
-    final message = {
-      'type': 'private',
-      'value': msg,
-      'destination': selectedClient,
-    };
-    _channel!.sink.add(jsonEncode(message));
-  }
+  return lista;
+}
 }
