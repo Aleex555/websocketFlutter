@@ -93,6 +93,7 @@ class _ImageGridViewState extends State<ImageGridView> {
         if (clickedStatus[index]) {
           imagePaths[index] = 'assets/$color.png';
           appData.board[index] = color;
+          appData.messageBoard();
         }
         int contador = appData.contarRepeticionesTotales(appData.board);
         print(appData.board);
@@ -105,12 +106,9 @@ class _ImageGridViewState extends State<ImageGridView> {
         }
 
         if (appData.tiradas == 2) {
+          Future.delayed(const Duration(seconds:2), () {
           appData.board = appData.modificarSinRepeticiones(appData.board);
           appData.messageBoard();
-
-          Future.delayed(const Duration(seconds:2), () {
-          
-
             for (int i = 0; i < appData.board.length; i++) {
               if (appData.board[i] == '-') {
                 imagePaths[i] = 'assets/imagen_inicial.jpg';
@@ -129,7 +127,6 @@ class _ImageGridViewState extends State<ImageGridView> {
   Widget build(BuildContext context) {
     AppData appData = Provider.of<AppData>(context);
     if (appData.tuTurno == false){
-      print('hola');
       updateImagesAutomatically(appData);
     }
     return GridView.builder(
