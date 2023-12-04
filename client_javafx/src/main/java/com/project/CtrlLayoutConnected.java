@@ -175,7 +175,7 @@ public class CtrlLayoutConnected {
 
     @FXML
     public void imgpressed(MouseEvent event) {
-
+        tiradas++;
         if (infoData.tuTurno == true) {
             labelMiTurno.setVisible(true);
             labelRivalTurno.setVisible(false);
@@ -219,32 +219,34 @@ public class CtrlLayoutConnected {
 
                 sourceimagen.setImage(color);
                 board.set(imageIndex, board_colors.get(imageIndex));
-                infoData.setBoard(board);
+                infoData.board=board;
                 infoData.MessegeBoard(board, infoData.getPuntuacionMia());
 
-                int cantidad = infoData.contarRepeticionesTotales(board);
-
+                if (tiradas == 2){
+                    int cantidad = infoData.contarRepeticionesTotales(board);
                 if (cantidad == infoData.getPuntuacionMia() + 1) {
                     System.out.println("---has acertado una ams----");
                     infoData.setPuntuacionMia(infoData.getPuntuacionMia() + 1);
                     puntuacion1.setText(String.valueOf(infoData.getPuntuacionMia()));
                     tiradas = 0;
-                } else {
-                    System.out.println(tiradas);
-                    tiradas++;
                 }
-                ;
-                System.out.println(tiradas);
-                if (tiradas == 2) {
+                else {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                    }
                     System.out.println("board sin modificar-->" + board);
-                    infoData.modificarSinRepeticiones(board);
-                    System.out.println("board modificado-->" + board);
+                    AppData.modificarSinRepeticiones(board);
                     infoData.setBoard(board);
-                    System.err.println(board);
                     actualizarBoard(board);
+                    infoData.MessegeBoard(board, infoData.getPuntuacionMia());
+
                     infoData.tuTurno = false;
                 }
                 ;
+                }
+
+                
 
             } else {
                 // Si no es "-", cambia a la imagen inicial
@@ -257,7 +259,7 @@ public class CtrlLayoutConnected {
                 // infoData.MessegeBoard(board,infoData.getPuntuacionMia()+1);
 
             }
-            infoData.MessegeBoard(board, infoData.getPuntuacionMia());
+            
 
         }
 

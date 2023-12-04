@@ -15,13 +15,31 @@ enum ConnectionStatus {
 }
 
 class AppData with ChangeNotifier {
+  String plat = "";
   String ip = "localhost";
   String port = "8888";
   String usu = "";
   bool tuTurno = false;
   int puntuacionRival = 0;
   int miPuntuacion = 0;
-  List<dynamic> board = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"];
+  List<dynamic> board = [
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ];
 
   List<dynamic> boardColors = [];
 
@@ -70,20 +88,20 @@ class AppData with ChangeNotifier {
 
         switch (data['type']) {
           case "turno":
-                tuTurno = true;
-                print("lo recibi");
-                
-                break;
-            case "board":
-                board.clear();
-                board = data["list"];
-                puntuacionRival=data["puntuacion"];
+            tuTurno = true;
+            print("lo recibi");
 
-                board.remove(mySocketId);
-                print("board recibido");
-                
-            
-                
+            break;
+          case "tetoca":
+            plat = data['value'];
+            if (data['value'] == "android") {
+              tuTurno = true;
+            }
+          case "board":
+            board.clear();
+            board = data["list"];
+            puntuacionRival = data["puntuacion"];
+            print(board);
             break;
           case 'list':
             boardColors = data["list"];
@@ -157,34 +175,37 @@ class AppData with ChangeNotifier {
       'from': 'cliente',
       'puntuacion': miPuntuacion,
       'value': board,
-      'desti' : mySocketId
     };
     _channel!.sink.add(jsonEncode(message));
   }
+
+  finTurno() {
+    final message = {
+      'type': 'finturno',
+      'value': 'flutter',
+    };
+    _channel!.sink.add(jsonEncode(message));
+  }
+
   List modificarSinRepeticiones(List<dynamic> lista) {
-  for (int i = 0; i < lista.length; i++) {
-    String elementoActual = lista[i];
+    Set<String> nombresRepetidos = Set();
+    Set<String> nombresNoRepetidos = Set();
 
-    // Añadimos una condición para asegurarnos de que elementoActual no sea "-"
-    if (elementoActual != "-") {
-      bool seRepite = false;
-
-      for (int j = i + 1; j < lista.length; j++) {
-        String otroElemento = lista[j];
-
-        // Añadimos una condición para asegurarnos de que otroElemento no sea "-"
-        if (otroElemento != "-" && elementoActual == otroElemento) {
-          seRepite = true;
-          break;
-        }
-      }
-
-      if (!seRepite) {
-        // Si no se repite, modificamos la lista original para hacer que sea "-"
-        lista[i] = "-";
+    for (String nombre in lista) {
+      if (!nombresNoRepetidos.add(nombre)) {
+        // Si el nombre ya está en nombresNoRepetidos, entonces es repetido
+        nombresRepetidos.add(nombre);
       }
     }
+
+    for (int i = 0; i < lista.length; i++) {
+      String elementoActual = lista[i];
+
+      if (!nombresRepetidos.contains(elementoActual)) {
+        // Si el elemento no está en nombresRepetidos, se reemplaza con '-'
+        lista[i] = '-';
+      }
+    }
+    return lista;
   }
-  return lista;
-}
 }
