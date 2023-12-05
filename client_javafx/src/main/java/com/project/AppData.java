@@ -94,7 +94,7 @@ public class AppData {
         return contador;
     }
 
-    public static List<String> modificarSinRepeticiones(List<String> lista) {
+    public static List<String> modificarSinRepeticiones(List<String> lista)  {
         Set<String> nombresRepetidos = new HashSet<>();
         Set<String> nombresNoRepetidos = new HashSet<>();
 
@@ -113,9 +113,9 @@ public class AppData {
                 lista.set(i, "-");
             }
         }
-
         return lista;
     }
+    
 
     private AppData() {
     }
@@ -201,26 +201,38 @@ public class AppData {
 
         String type = data.getString("type");
         switch (type) {
+            case "tetoca":
+                String from = data.getString("value");
+                System.out.println(from);
+                if (from.equals("flutter")){
+                    tuTurno = true;
+                    System.out.println("lo recibi");
+                }
+                
+                
+                
+                break;
             case "turno":
                 tuTurno = true;
                 System.out.println("lo recibi");
                 
                 break;
             case "board":
-            System.out.println(board_colors);
                 CtrlLayoutConnected layautcoenConnected = new CtrlLayoutConnected();
                 board.clear();
                 data.getJSONArray("list").forEach(item -> board.add(item.toString()));
+           
                 setPuntuacionRival(data.getInt("puntuacion"));
 
-                
+                System.out.println("board recibido--->"+board);
+
+      
 
                 String miPuntuacion = String.valueOf(puntuacionMia);
 
-                board.remove(mySocketId);
               
-
-                layautcoenConnected.actualizarBoard(board);
+                System.out.println(board);
+                layautcoenConnected.actualizarBoard(board,true);
                 
             
                 
@@ -339,7 +351,7 @@ public class AppData {
 
     public void broadcastMessage(String msg) {
         JSONObject message = new JSONObject();
-        message.put("type", "broadcast");
+        message.put("type", "finturno");
         message.put("value", msg);
         socketClient.send(message.toString());
     }

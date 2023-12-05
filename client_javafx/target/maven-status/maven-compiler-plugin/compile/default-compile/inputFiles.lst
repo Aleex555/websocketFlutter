@@ -1,8 +1,8 @@
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/CtrlLayoutDisconnecting.java
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/CtrlLayoutConnecting.java
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/AppData.java
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/AppSocketsClient.java
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/CtrlLayoutConnected.java
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/CtrlLayoutDisconnected.java
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/Main.java
-/home/super/websocketFlutter/client_javafx/src/main/java/com/project/UtilsViews.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/CtrlLayoutDisconnected.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/AppSocketsClient.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/CtrlLayoutConnecting.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/AppData.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/Main.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/CtrlLayoutConnected.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/UtilsViews.java
+/home/super/repositorios/web_sockeds_memory/client_javafx/src/main/java/com/project/CtrlLayoutDisconnecting.java

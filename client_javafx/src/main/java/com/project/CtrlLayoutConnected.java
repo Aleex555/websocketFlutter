@@ -35,7 +35,9 @@ public class CtrlLayoutConnected {
     private TextArea messagesArea;
 
     @FXML
-    private Label puntuacion2, puntuacion1, labelMiTurno, labelRivalTurno;
+    private Label puntuacion2,puntuacion1,labelMiTurno,labelRivalTurno;
+
+  
 
     @FXML
     private Text jugador1;
@@ -50,18 +52,22 @@ public class CtrlLayoutConnected {
     private TextField messageField;
 
     @FXML
-    private Button sendButton, start;
+    private Button sendButton,start;
 
     @FXML
-    private ImageView imagen1, imagen2, imagen3, imagen4, imagen5, imagen6, imagen7, imagen8, imagen9, imagen10,
-            imagen11, imagen12,
-            imagen13, imagen14, imagen15, imagen16;
+    private ImageView imagen1,imagen2,imagen3,imagen4,imagen5,imagen6,imagen7,imagen8,imagen9,imagen10,imagen11,imagen12,
+    imagen13,imagen14,imagen15,imagen16;
 
     @FXML
     private static List<ImageView> imageViews = new ArrayList<>();
 
     AppData infoData = AppData.getInstance();
 
+    
+
+
+    
+    
     static Image imagenInicial = new Image("/assets/imagen_inicial.jpg");
 
     static Image rojo = new Image("/assets/rojo.png");
@@ -74,23 +80,30 @@ public class CtrlLayoutConnected {
     static Image azul = new Image("/assets/azul.png");
 
     // rojo,negro,amarillo,blanco,gris,naranja,rosa,verde
-
-    // List<String> board_colors = new ArrayList<>((Arrays.asList("rojo", "negro",
-    // "amarillo", "azul", "gris", "naranja", "rosa", "verde","rojo", "negro",
-    // "amarillo", "azul", "gris", "naranja", "rosa", "verde")));
-
+    
+    
+    //List<String> board_colors = new ArrayList<>((Arrays.asList("rojo", "negro", "amarillo", "azul", "gris", "naranja", "rosa", "verde","rojo", "negro", "amarillo", "azul", "gris", "naranja", "rosa", "verde")));
+    
     List<String> board_colors = infoData.getBoard_colors();
 
-    static List<String> board = new ArrayList<>(
-            Arrays.asList("-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"));
 
     Random random = new Random();
 
+ 
+
+
     public void initialize() {
+        Collections.shuffle(board_colors);
 
         puntuacion2.setText("0");
-
+   
         puntuacion1.setText("0");
+
+        
+
+       
+  
+      
 
         imageViews.add(imagen1);
         imageViews.add(imagen2);
@@ -108,7 +121,9 @@ public class CtrlLayoutConnected {
         imageViews.add(imagen14);
         imageViews.add(imagen15);
         imageViews.add(imagen16);
-
+        
+        
+        
         System.out.println(board_colors);
         clientsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
@@ -117,7 +132,7 @@ public class CtrlLayoutConnected {
             // Set new selection (or deselect)
             AppData appData = AppData.getInstance();
             int clickedIndex = clientsList.getSelectionModel().getSelectedIndex();
-            appData.selectClient(clickedIndex);
+            appData.selectClient(clickedIndex); 
 
             // Get real selection (can be unset)
             Integer selectedIndex = appData.getSelectedClientIndex();
@@ -132,10 +147,13 @@ public class CtrlLayoutConnected {
             for (int i = 0; i < clientsList.getItems().size(); i++) {
                 clientsList.getSelectionModel().clearSelection(i);
             }
+            
 
             appData.updateClientList();
         });
 
+        
+    
         clientsList.setCellFactory(lv -> new ListCell<String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -155,16 +173,17 @@ public class CtrlLayoutConnected {
             }
         });
 
+        
     }
 
     @FXML
     public void startBoton(ActionEvent event) {
         System.out.println(infoData.tuTurno);
 
-        if (infoData.tuTurno == true) {
+         if(infoData.tuTurno==true){
             labelMiTurno.setVisible(true);
             labelRivalTurno.setVisible(false);
-        } else if (infoData.tuTurno != true) {
+        }else if (infoData.tuTurno!=true) {
             labelRivalTurno.setVisible(true);
             labelMiTurno.setVisible(false);
         }
@@ -172,99 +191,134 @@ public class CtrlLayoutConnected {
     }
 
     int tiradas = 0;
-
+    
     @FXML
     public void imgpressed(MouseEvent event) {
-        tiradas++;
-        if (infoData.tuTurno == true) {
+        
+        
+        if(infoData.tuTurno==true){
             labelMiTurno.setVisible(true);
             labelRivalTurno.setVisible(false);
-        } else if (infoData.tuTurno != true) {
+        }else if (infoData.tuTurno!=true) {
             labelRivalTurno.setVisible(true);
             labelMiTurno.setVisible(false);
         }
 
-        if (infoData.tuTurno) {
+        boolean finalturno = false;
+        
+        if (infoData.tuTurno){        
             puntuacion2.setText(String.valueOf(infoData.getPuntuacionRival()));
-
+        
             ImageView sourceimagen = (ImageView) event.getSource();
 
             // Obtiene el índice de la imagen en la lista
             int imageIndex = imageViews.indexOf(sourceimagen);
 
-            Image color = null;
+            Image color= null;
 
             // Verifica el contenido del tablero en esa posición
 
             // rojo,negro,amarillo,blanco,gris,naranja,rosa,verde
-            if (board.get(imageIndex).equals("-")) {
+            if (infoData.board.get(imageIndex).equals("-")) {
                 // Si es "-", cambia a rojo
-                if (board_colors.get(imageIndex).equals("rojo")) {
+                if (board_colors.get(imageIndex).equals("rojo")){
                     color = rojo;
-                } else if (board_colors.get(imageIndex).equals("negro")) {
+                }else if (board_colors.get(imageIndex).equals("negro")){
                     color = negro;
-                } else if (board_colors.get(imageIndex).equals("amarillo")) {
+                }else if (board_colors.get(imageIndex).equals("amarillo")){
                     color = amarillo;
-                } else if (board_colors.get(imageIndex).equals("azul")) {
+                }else if (board_colors.get(imageIndex).equals("azul")){
                     color = azul;
-                } else if (board_colors.get(imageIndex).equals("gris")) {
+                }else if (board_colors.get(imageIndex).equals("gris")){
                     color = gris;
-                } else if (board_colors.get(imageIndex).equals("naranja")) {
+                }else if (board_colors.get(imageIndex).equals("naranja")){
                     color = naranja;
-                } else if (board_colors.get(imageIndex).equals("rosa")) {
+                }else if (board_colors.get(imageIndex).equals("rosa")){
                     color = rosa;
-                } else if (board_colors.get(imageIndex).equals("verde")) {
+                }else if (board_colors.get(imageIndex).equals("verde")){
                     color = verde;
-                }
+                };
 
                 sourceimagen.setImage(color);
-                board.set(imageIndex, board_colors.get(imageIndex));
-                infoData.board=board;
-                infoData.MessegeBoard(board, infoData.getPuntuacionMia());
 
-                if (tiradas == 2){
-                    int cantidad = infoData.contarRepeticionesTotales(board);
-                if (cantidad == infoData.getPuntuacionMia() + 1) {
-                    System.out.println("---has acertado una ams----");
-                    infoData.setPuntuacionMia(infoData.getPuntuacionMia() + 1);
-                    puntuacion1.setText(String.valueOf(infoData.getPuntuacionMia()));
-                    tiradas = 0;
-                }
-                else {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (Exception e) {
-                    }
-                    System.out.println("board sin modificar-->" + board);
-                    AppData.modificarSinRepeticiones(board);
-                    infoData.setBoard(board);
-                    actualizarBoard(board);
-                    infoData.MessegeBoard(board, infoData.getPuntuacionMia());
+            
+                System.out.println("board antes del set"+infoData.board);
+                infoData.board.set(imageIndex, board_colors.get(imageIndex));
+                infoData.setBoard(infoData.board);
 
-                    infoData.tuTurno = false;
-                }
-                ;
-                }
-
+                System.out.println("despues del click "+infoData.board);
+                infoData.MessegeBoard(infoData.board,infoData.getPuntuacionMia());
+             
                 
+          
 
+                int cantidad = infoData.contarRepeticionesTotales(infoData.board);
+
+                System.out.println(cantidad);
+                if (cantidad == infoData.getPuntuacionMia()+1){
+                    System.out.println("---has acertado una ams----");
+                    infoData.setPuntuacionMia(infoData.getPuntuacionMia()+1);
+                    puntuacion1.setText(String.valueOf(infoData.getPuntuacionMia()));
+                    tiradas=0;
+                    finalturno = false;
+                    System.out.println("acertado tiradas-->"+tiradas);
+                }else{
+                    tiradas++;
+                    finalturno =false;
+                    System.out.println("fallo tiradas-->"+tiradas);
+                    if (tiradas==2){
+                    
+                    /*
+                    
+                     */
+                    
+                    System.out.println("fallo 2 tiradas-->"+tiradas);
+                    
+                    
+                    
+                    finalturno = true;
+                    
+                    
+                    infoData.board=infoData.modificarSinRepeticiones(infoData.board);
+                    System.out.println(infoData.board);
+
+                    infoData.setBoard(infoData.board);
+                    infoData.tuTurno=false;
+                    tiradas=0;
+                   
+
+                    actualizarBoard(infoData.board,false);
+                    
+                    
+                    System.out.println("board que envio--->"+infoData.board);
+                    infoData.broadcastMessage("android");
+                    infoData.MessegeBoard(infoData.board,infoData.getPuntuacionMia());
+                    
+
+                };
+                
+            }
+                
+                
+            
             } else {
                 // Si no es "-", cambia a la imagen inicial
                 sourceimagen.setImage(imagenInicial);
-                board.set(imageIndex, "-");
+                infoData.board.set(imageIndex, "-");
 
                 System.out.println("entre qui");
 
-                infoData.setBoard(board);
-                // infoData.MessegeBoard(board,infoData.getPuntuacionMia()+1);
-
-            }
-            
-
-        }
-
+                infoData.setBoard(infoData.board);          
+            };
+          
+    }else{
+      System.out.println("entre en este else");
+  
     }
-
+        
+    }
+    
+    
     @FXML
     private void handleDisconnect(ActionEvent event) {
         AppData appData = AppData.getInstance();
@@ -275,7 +329,7 @@ public class CtrlLayoutConnected {
     private void handleSend(ActionEvent event) {
         AppData appData = AppData.getInstance();
         String message = messageField.getText();
-        // appData.send(message);
+        //appData.send(message);
         messageField.clear();
     }
 
@@ -295,55 +349,55 @@ public class CtrlLayoutConnected {
         });
     }
 
-    public void actualizarBoard(List<String> nuevoBoard) {
-        System.out.println(infoData.tuTurno);
-        System.out.println("nuevo board" + nuevoBoard);
-        board = nuevoBoard;
-        System.out.println(board);
 
-        // Actualiza las imágenes en las ImageView según el contenido del nuevo board
-        for (int i = 0; i < imageViews.size() && i < board.size(); i++) {
-            ImageView imageView = imageViews.get(i);
-            String color = board.get(i);
-
-            // Lógica para asignar la imagen según el color o la imagen inicial si es "-"
-            Image nuevaImagen;
-            if (color.equals("-")) {
-                nuevaImagen = imagenInicial;
-            } else {
-                switch (color) {
-                    case "rojo":
-                        nuevaImagen = rojo;
-                        break;
-                    case "negro":
-                        nuevaImagen = negro;
-                        break;
-                    case "amarillo":
-                        nuevaImagen = amarillo;
-                        break;
-                    case "azul":
-                        nuevaImagen = azul;
-                        break;
-                    case "gris":
-                        nuevaImagen = gris;
-                        break;
-                    case "naranja":
-                        nuevaImagen = naranja;
-                        break;
-                    case "rosa":
-                        nuevaImagen = rosa;
-                        break;
-                    case "verde":
-                        nuevaImagen = verde;
-                        break;
-                    default:
-                        nuevaImagen = imagenInicial;
+    public void actualizarBoard(List<String> nuevoBoard,boolean mio) {
+            if (mio!=true){
+                
+            }
+            // Actualiza las imágenes en las ImageView según el contenido del nuevo board
+            for (int i = 0; i < imageViews.size() && i < nuevoBoard.size(); i++) {
+                ImageView imageView = imageViews.get(i);
+                String color = nuevoBoard.get(i);
+    
+                // Lógica para asignar la imagen según el color o la imagen inicial si es "-"
+                Image nuevaImagen;
+                if (color.equals("-")) {
+                    nuevaImagen = imagenInicial;
+                } else {
+                    switch (color) {
+                        case "rojo":
+                            nuevaImagen = rojo;
+                            break;
+                        case "negro":
+                            nuevaImagen = negro;
+                            break;
+                        case "amarillo":
+                            nuevaImagen = amarillo;
+                            break;
+                        case "azul":
+                            nuevaImagen = azul;
+                            break;
+                        case "gris":
+                            nuevaImagen = gris;
+                            break;
+                        case "naranja":
+                            nuevaImagen = naranja;
+                            break;
+                        case "rosa":
+                            nuevaImagen = rosa;
+                            break;
+                        case "verde":
+                            nuevaImagen = verde;
+                            break;
+                        default:
+                            nuevaImagen = imagenInicial;
+                    }
                 }
+    
+                imageView.setImage(nuevaImagen);
             }
 
-            imageView.setImage(nuevaImagen);
-        }
-
+        
     }
 
 }
